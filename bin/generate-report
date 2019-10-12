@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+
+usage() {
+    err "Usage: $(basename $0) all|compute|fs-home|fs-hii-work|fs-shares"
+}
+
+err() {
+  echo "$@" 2>&1
+}
+
+notebook() {
+  local report=$1
+  local notebook
+  local prefix
+
+  case $report in
+    fs-home|fs-hii-work)
+      notebook=fs-user
+    ;;
+    *)
+      notebook=${report}
+    ;;
+  esac
+
+  source activate hpcreport
+
+  REPORT=${report} \
+    jupyter nbconvert --execute --ExecutePreprocessor.timeout=3600 \
+    --to html --output tmp/${report}-$(date +%Y-%m) ${notebook}.ipynb
+}
+
+[[ $# -lt 1 ]] && usage
+
+for arg in "$@"; do
+  case $1 in
+    all)
+      notebook compute
+      notebook fs-home
+      notebook fs-hii-work
+      notebook fs-shares
+    ;;
+  compute|fs-home|fs-hii-work|fs-shares)
+    notebook $1
+  ;;
+  *)
+    err "Option not found."
+    ;;
+  esac
+done

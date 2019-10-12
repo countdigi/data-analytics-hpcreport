@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+rsync --recursive --verbose --ignore-existing tmp/*.html rhino.epi.usf.edu:/depot/src/countskm/hpcreport/reports/
